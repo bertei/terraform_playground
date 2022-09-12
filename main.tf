@@ -115,8 +115,28 @@ resource "aws_instance" "bt_app-webserver_1" {
     availability_zone = var.avail_zone
     ##Public IP for the ec2
     associate_public_ip_address = true
-    ##bootstrap
-    user_data = file("entry-script.sh")
+    ##bootstrap - "remote-exec" = invokes a script on a remote resource after it is created.
+    ##The difference between this and user_Data. Is that user data passes the data to aws. Remote-exec connects via ssh using terra
+    connection {
+      type = "ssh"
+      host = self.public_ip
+      user = "ec2-user"
+      private_key = file(var.private_key)
+    }
+    provisioner "remote-exec" {
+      inline = [
+        ##code to execute via ssh
+        "sudo yum ..."
+      ]
+      ##or execute a script file (it must already exist in the sv)
+      script = file("script.sh")
+    }
+    ##"file" provisioner = copy files or directories form local to newly created resource
+    provisioner "file" {
+      source = "file_name"
+      destination = "/home/ec2-user/script.sh"
+    }
+
     ##Key
     key_name = "bt_app-webserver_1"
     ##Tags
