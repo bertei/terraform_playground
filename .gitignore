@@ -8,4 +8,6 @@
 #tf variable files, may include sensitive data
 *.tfvars
 
-bt_app-webserver_1.pem
+##ignore crash logs
+crash.log
+
